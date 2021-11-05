@@ -1,0 +1,4 @@
+fastAPI
+prometheus_client
+prometheus_fastapi_instrumentator
+uvicorn

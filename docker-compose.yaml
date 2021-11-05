@@ -1,0 +1,37 @@
+version: '3.7'
+
+volumes:
+  prometheus_data: {}
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    networks:
+      - backend
+    restart: always
+
+  prom_python_app:
+    image: python:3.9.5
+    working_dir: /app
+    volumes:
+      - ${PWD}/prom_python_app/:/app/
+    command: bash -c "pip install -r requirements.txt && make run"
+    ports:
+      - 3001:3001
+    networks:
+      - backend
